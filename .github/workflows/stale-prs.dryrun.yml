@@ -1,0 +1,32 @@
+name: stale-prs
+on:
+  push:
+    branches:
+      - wf-dryrun/njrxtj
+permissions:
+  pull-requests: write
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DRY_RUN: "true"
+    steps:
+      - name: Stale PRs
+        if: env.DRY_RUN != 'true'
+        uses: actions/stale@v9
+        with:
+          days-before-stale: 14
+          days-before-close: -1
+          stale-pr-message: This pull request has not had recent activity and will be marked as stale.
+          stale-pr-label: stale
+      - name: Dry run - would mark stale
+        if: env.DRY_RUN == 'true'
+        run: |
+          echo "[dry-run] Would mark pull requests inactive for 14 days as stale and add the 'stale' label."
+env:
+  DRY_RUN: "true"
