@@ -1,0 +1,12 @@
+{
+  "name": "chores-demo",
+  "version": "1.4.0",
+  "description": "A tiny Node project used to demonstrate generated GitHub Actions workflows.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/",
+    "lint": "node --check index.js && node --check test/greet.test.js"
+  },
+  "license": "MIT"
+}
