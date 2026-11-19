@@ -1,10 +1,4 @@
 name: stale-prs
-permissions:
-  pull-requests: write
-  issues: write
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 on:
   schedule:
     - cron: '0 9 * * 1'
@@ -14,6 +8,12 @@ on:
         description: 'Run in dry-run mode'
         required: false
         default: 'false'
+permissions:
+  pull-requests: write
+  issues: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   stale:
     runs-on: ubuntu-latest
@@ -21,7 +21,11 @@ jobs:
     env:
       DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
     steps:
-      - name: 'Stale pull requests'
+      - name: 'Dry run - would mark stale'
+        if: env.DRY_RUN == 'true'
+        run: |
+          echo "[dry-run] Would run actions/stale@v9 with 14 day threshold"
+      - name: Mark stale PRs
         if: env.DRY_RUN != 'true'
         uses: actions/stale@v9
         with:
@@ -29,7 +33,3 @@ jobs:
           days-before-close: -1
           stale-pr-message: 'This pull request has been inactive for 14 days and is now marked as stale.'
           stale-pr-label: 'stale'
-      - name: 'Dry run - would mark stale'
-        if: env.DRY_RUN == 'true'
-        run: |
-          echo "[dry-run] Would mark pull requests inactive for 14 days as stale and add the 'stale' label."
